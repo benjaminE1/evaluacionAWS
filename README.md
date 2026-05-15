@@ -1,42 +1,148 @@
-# Proyecto Cloud Computing - Repositorio de Aplicación
+# Tankpedia - Gestor de Tanques
 
-[cite_start]Este repositorio contiene la solución técnica para el despliegue de una aplicación web funcional en AWS, cumpliendo con los requerimientos de infraestructura, contenerización y documentación técnica[cite: 1, 3].
+Aplicación Laravel 13 para gestionar tanques, municiones, combustibles, fabricantes, países y conflictos. Contenerizada con Docker y lista para AWS.
 
-## 🏗️ 1. Arquitectura de la Solución
-[cite_start]La arquitectura se basa en un modelo de infraestructura como servicio (IaaS) y contenedores[cite: 3, 4]:
-* [cite_start]**Servidor de Aplicación:** Instancia **Amazon EC2** (IaaS)[cite: 4].
-* [cite_start]**Contenerización:** Docker para el backend y servicios dependientes[cite: 6].
-* [cite_start]**Base de Datos:** MySQL ejecutado en un contenedor con persistencia de datos[cite: 5].
-* [cite_start]**Redes:** Configuración de **Security Groups** para acceso controlado vía HTTP (80) y SSH (22)[cite: 7].
+## 🚀 Inicio Rápido
 
-## 🐳 2. Dockerfile y Contenedores
-[cite_start]Se incluye el archivo `Dockerfile` en la raíz del proyecto para la creación de la imagen de la aplicación.
-* [cite_start]**Orquestación:** Se utiliza **Docker Compose** para gestionar la relación entre el servidor de aplicación y la base de datos de forma automática[cite: 6, 7].
+### Requisitos
+- Docker Desktop
+- Git
 
-## 🚀 3. Instrucciones de Despliegue
-[cite_start]Siga estos pasos para desplegar la aplicación en una instancia EC2:
+### Instalar y Ejecutar (Local)
 
-1.  **Preparación:** Clonar este repositorio en la instancia.
-    ```bash
-    git clone <url-del-repositorio>
-    cd <nombre-carpeta>
-    ```
-2.  **Configuración:** Crear el archivo de entorno y configurar las credenciales de base de datos.
-    ```bash
-    cp .env.example .env
-    ```
-3.  **Levantamiento:** Construir y ejecutar los contenedores.
-    ```bash
-    docker-compose up -d --build
-    ```
-4.  **Base de Datos:** Ejecutar las migraciones necesarias.
-    ```bash
-    docker exec -it <nombre_contenedor> php artisan migrate
-    ```
+```bash
+# Clonar
+git clone https://github.com/usuario/tankpedia.git
+cd tankpedia
 
-## 📁 4. Código Fuente
-[cite_start]El repositorio incluye la estructura completa del proyecto (Laravel), archivos de configuración de entorno, scripts de migración y archivos de orquestación (Docker Compose) necesarios para la continuidad operacional.
+# Iniciar contenedores
+docker-compose up -d --build
 
-## 🛡️ 5. Continuidad y Resiliencia
-* [cite_start]**DRP:** En caso de falla, la recuperación se realiza mediante el despliegue de una nueva instancia y la clonación de este repositorio (RTO estimado: 10 min)[cite: 8].
-* [cite_start]**BCP:** Mitigación de riesgos mediante políticas de reinicio automático de servicios en Docker.
+# Ejecutar migraciones
+docker exec -it laravel_app php artisan migrate
+```
+
+Acceder en: **http://localhost**
+
+---
+
+## 🏗️ Arquitectura
+
+- **Backend:** Laravel 13 (PHP 8.3) en Docker
+- **Frontend:** Blade Templates + Tailwind CSS
+- **BD:** MySQL 8.0 (en contenedor con persistencia)
+- **Orquestación:** Docker Compose
+
+```
+Cliente (navegador)
+    ↓ HTTP
+EC2 Instance (AWS)
+    ├─ laravel_app (puerto 8000)
+    └─ mysql_db (puerto 3306)
+```
+
+---
+
+## 📂 Estructura
+
+```
+app/
+├── Http/Controllers/    # TanqueController, MunicionController, etc.
+└── Models/             # Tanque, Municion, Combustible, etc.
+
+database/
+├── migrations/         # Tablas de BD
+└── seeders/           # Datos iniciales
+
+resources/
+├── views/             # Plantillas Blade
+└── css/               # Tailwind CSS
+```
+
+---
+
+## 🔑 Modelos Principales
+
+- **Tanque** - Vehículo blindado (relaciones: País, Fabricante, Combustible)
+- **Municion** - Proyectiles
+- **Combustible** - Tipos de carburante
+- **Fabricante** - Empresas productoras
+- **Pais** - Naciones
+- **Conflicto** - Eventos históricos
+
+---
+
+## 🌐 Rutas Disponibles
+
+```
+/tanques           # CRUD de tanques
+/municiones        # CRUD de municiones
+/combustibles      # CRUD de combustibles
+/fabricantes       # CRUD de fabricantes
+/paises            # CRUD de países
+/conflictos        # CRUD de conflictos
+```
+
+---
+
+## ☁️ Despliegue en AWS
+
+### En Instancia EC2 (Ubuntu 22.04)
+
+```bash
+# Conectar por SSH
+ssh -i clave.pem ubuntu@tu-ip
+
+# Instalar Docker
+sudo apt update && sudo apt install -y docker.io
+sudo usermod -aG docker ubuntu
+
+# Clonar y ejecutar
+git clone https://github.com/usuario/tankpedia.git
+cd tankpedia
+docker-compose up -d --build
+docker exec -it laravel_app php artisan migrate
+```
+
+Acceder en: **http://tu-ip-publica**
+
+### Variables de Entorno (.env)
+
+```env
+APP_NAME=Tankpedia
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=http://tu-ip-publica
+
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=tankpedia
+DB_USERNAME=root
+DB_PASSWORD=tu-password-seguro
+```
+
+---
+
+## 🐛 Troubleshooting
+
+| Problema | Solución |
+|----------|----------|
+| Puerto 80 en uso | Cambiar en `docker-compose.yml`: `"8080:8000"` |
+| Error de conexión BD | Esperar a que MySQL inicie: `docker-compose logs mysql_db` |
+| Permisos en storage | `docker exec -it laravel_app chmod -R 777 storage` |
+| Ver logs | `docker-compose logs -f laravel_app` |
+
+---
+
+## 🔒 Seguridad (Producción)
+
+- ✅ `APP_DEBUG=false`
+- ✅ Cambiar contraseña MySQL
+- ✅ Security Group: solo puertos 80, 443, 22
+- ✅ HTTPS con SSL/TLS
+- ✅ Backups automáticos de BD
+
+---
+
+**Versión:** 1.0.0 | **Stack:** Laravel 13 + Docker + AWS
