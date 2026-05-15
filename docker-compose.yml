@@ -4,10 +4,11 @@ services:
   app:
     build: .
     container_name: laravel_app
+    restart: always
     volumes:
       - .:/var/www
     ports:
-      - "8000:8000"
+      - "80:8000"
     depends_on:
       - db
     environment:
