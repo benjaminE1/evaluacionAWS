@@ -1,58 +1,42 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Proyecto Cloud Computing - Repositorio de Aplicación
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[cite_start]Este repositorio contiene la solución técnica para el despliegue de una aplicación web funcional en AWS, cumpliendo con los requerimientos de infraestructura, contenerización y documentación técnica[cite: 1, 3].
 
-## About Laravel
+## 🏗️ 1. Arquitectura de la Solución
+[cite_start]La arquitectura se basa en un modelo de infraestructura como servicio (IaaS) y contenedores[cite: 3, 4]:
+* [cite_start]**Servidor de Aplicación:** Instancia **Amazon EC2** (IaaS)[cite: 4].
+* [cite_start]**Contenerización:** Docker para el backend y servicios dependientes[cite: 6].
+* [cite_start]**Base de Datos:** MySQL ejecutado en un contenedor con persistencia de datos[cite: 5].
+* [cite_start]**Redes:** Configuración de **Security Groups** para acceso controlado vía HTTP (80) y SSH (22)[cite: 7].
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🐳 2. Dockerfile y Contenedores
+[cite_start]Se incluye el archivo `Dockerfile` en la raíz del proyecto para la creación de la imagen de la aplicación.
+* [cite_start]**Orquestación:** Se utiliza **Docker Compose** para gestionar la relación entre el servidor de aplicación y la base de datos de forma automática[cite: 6, 7].
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 3. Instrucciones de Despliegue
+[cite_start]Siga estos pasos para desplegar la aplicación en una instancia EC2:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1.  **Preparación:** Clonar este repositorio en la instancia.
+    ```bash
+    git clone <url-del-repositorio>
+    cd <nombre-carpeta>
+    ```
+2.  **Configuración:** Crear el archivo de entorno y configurar las credenciales de base de datos.
+    ```bash
+    cp .env.example .env
+    ```
+3.  **Levantamiento:** Construir y ejecutar los contenedores.
+    ```bash
+    docker-compose up -d --build
+    ```
+4.  **Base de Datos:** Ejecutar las migraciones necesarias.
+    ```bash
+    docker exec -it <nombre_contenedor> php artisan migrate
+    ```
 
-## Learning Laravel
+## 📁 4. Código Fuente
+[cite_start]El repositorio incluye la estructura completa del proyecto (Laravel), archivos de configuración de entorno, scripts de migración y archivos de orquestación (Docker Compose) necesarios para la continuidad operacional.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
-```
-
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🛡️ 5. Continuidad y Resiliencia
+* [cite_start]**DRP:** En caso de falla, la recuperación se realiza mediante el despliegue de una nueva instancia y la clonación de este repositorio (RTO estimado: 10 min)[cite: 8].
+* [cite_start]**BCP:** Mitigación de riesgos mediante políticas de reinicio automático de servicios en Docker.
